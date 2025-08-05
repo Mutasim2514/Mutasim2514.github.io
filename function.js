@@ -1,4 +1,199 @@
-      // Smooth scrolling for navigation links
+        // Particle Network System
+        class ParticleNetwork {
+            constructor() {
+                this.canvas = document.getElementById('particle-canvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.mouse = { x: 0, y: 0 };
+                this.animationId = null;
+                
+                this.settings = {
+                    particleCount: 200,
+                    maxDistance: 120,
+                    mouseRadius: 150,
+                    colors: [
+                        'rgba(255, 0, 102, 0.8)',   // Pink
+                        'rgba(204, 0, 255, 0.8)',  // Purple  
+                        'rgba(51, 102, 255, 0.8)', // Blue
+                        'rgba(0, 204, 255, 0.8)'   // Cyan
+                    ]
+                };
+                
+                this.init();
+                this.bindEvents();
+            }
+            
+            init() {
+                this.resizeCanvas();
+                this.createParticles();
+                this.animate();
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            createParticles() {
+                this.particles = [];
+                for (let i = 0; i < this.settings.particleCount; i++) {
+                    // Increased initial velocity range for more movement
+                    const speed = Math.random() * 1.5 + 0.5; // Speed between 0.5 and 2
+                    const angle = Math.random() * Math.PI * 2; // Random direction
+                    
+                    this.particles.push({
+                        x: Math.random() * this.canvas.width,
+                        y: Math.random() * this.canvas.height,
+                        vx: Math.cos(angle) * speed, // More dynamic initial velocity
+                        vy: Math.sin(angle) * speed,
+                        baseVx: Math.cos(angle) * speed, // Store base velocity for reference
+                        baseVy: Math.sin(angle) * speed,
+                        size: Math.random() * 3 + 1,
+                        color: this.settings.colors[Math.floor(Math.random() * this.settings.colors.length)],
+                        opacity: Math.random() * 0.5 + 0.5
+                    });
+                }
+            }
+            
+            updateParticles() {
+                this.particles.forEach(particle => {
+                    // Update position
+                    particle.x += particle.vx;
+                    particle.y += particle.vy;
+                    
+                    // Bounce off edges with some energy retention
+                    if (particle.x < 0 || particle.x > this.canvas.width) {
+                        particle.vx *= -0.8; // Slight energy loss on bounce
+                        particle.x = Math.max(0, Math.min(this.canvas.width, particle.x));
+                    }
+                    if (particle.y < 0 || particle.y > this.canvas.height) {
+                        particle.vy *= -0.8; // Slight energy loss on bounce
+                        particle.y = Math.max(0, Math.min(this.canvas.height, particle.y));
+                    }
+                    
+                    // Mouse attraction with enhanced effect
+                    const dx = this.mouse.x - particle.x;
+                    const dy = this.mouse.y - particle.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < this.settings.mouseRadius) {
+                        const force = (this.settings.mouseRadius - distance) / this.settings.mouseRadius;
+                        particle.vx += dx * force * 0.005; // Slightly stronger attraction
+                        particle.vy += dy * force * 0.005;
+                    }
+                    
+                    // Apply gentle friction to prevent particles from stopping
+                    particle.vx *= 0.995; // Less friction for more movement
+                    particle.vy *= 0.995;
+                    
+                    // Add slight random movement to prevent particles from becoming static
+                    particle.vx += (Math.random() - 0.5) * 0.02;
+                    particle.vy += (Math.random() - 0.5) * 0.02;
+                    
+                    // Limit maximum velocity to prevent particles from moving too fast
+                    const maxVelocity = 3;
+                    const currentSpeed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
+                    if (currentSpeed > maxVelocity) {
+                        particle.vx = (particle.vx / currentSpeed) * maxVelocity;
+                        particle.vy = (particle.vy / currentSpeed) * maxVelocity;
+                    }
+                    
+                    // Ensure minimum movement - if particle is too slow, give it a gentle push
+                    const minSpeed = 0.1;
+                    if (currentSpeed < minSpeed) {
+                        const pushAngle = Math.random() * Math.PI * 2;
+                        particle.vx += Math.cos(pushAngle) * 0.3;
+                        particle.vy += Math.sin(pushAngle) * 0.3;
+                    }
+                });
+            }
+            
+            drawParticles() {
+                this.particles.forEach(particle => {
+                    this.ctx.save();
+                    this.ctx.globalAlpha = particle.opacity;
+                    this.ctx.fillStyle = particle.color;
+                    this.ctx.beginPath();
+                    this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                    this.ctx.fill();
+                    this.ctx.restore();
+                });
+            }
+            
+            drawConnections() {
+                for (let i = 0; i < this.particles.length; i++) {
+                    for (let j = i + 1; j < this.particles.length; j++) {
+                        const dx = this.particles[i].x - this.particles[j].x;
+                        const dy = this.particles[i].y - this.particles[j].y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        
+                        if (distance < this.settings.maxDistance) {
+                            const opacity = (this.settings.maxDistance - distance) / this.settings.maxDistance;
+                            this.ctx.save();
+                            this.ctx.globalAlpha = opacity * 0.3;
+                            this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                            this.ctx.lineWidth = 1;
+                            this.ctx.beginPath();
+                            this.ctx.moveTo(this.particles[i].x, this.particles[i].y);
+                            this.ctx.lineTo(this.particles[j].x, this.particles[j].y);
+                            this.ctx.stroke();
+                            this.ctx.restore();
+                        }
+                    }
+                }
+            }
+            
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.updateParticles();
+                this.drawConnections();
+                this.drawParticles();
+                
+                this.animationId = requestAnimationFrame(() => this.animate());
+            }
+            
+            bindEvents() {
+                window.addEventListener('resize', () => {
+                    this.resizeCanvas();
+                    this.createParticles();
+                });
+                
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.clientX;
+                    this.mouse.y = e.clientY;
+                });
+                
+                // Mobile touch support
+                window.addEventListener('touchmove', (e) => {
+                    if (e.touches.length > 0) {
+                        this.mouse.x = e.touches[0].clientX;
+                        this.mouse.y = e.touches[0].clientY;
+                    }
+                });
+            }
+            
+            destroy() {
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                }
+            }
+        }
+        
+        // Initialize particle network
+        let particleNetwork;
+        window.addEventListener('load', () => {
+            particleNetwork = new ParticleNetwork();
+        });
+        
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (particleNetwork) {
+                particleNetwork.destroy();
+            }
+        });
+
+        // Smooth scrolling for navigation links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
