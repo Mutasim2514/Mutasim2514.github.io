@@ -1,3 +1,23 @@
+        // Loading Screen Management
+        window.addEventListener('load', () => {
+            // Simulate loading time for better UX
+            setTimeout(() => {
+                const loadingScreen = document.getElementById('loadingScreen');
+                const mainContent = document.getElementById('mainContent');
+                
+                loadingScreen.classList.add('hidden');
+                mainContent.classList.add('loaded');
+                
+                // Initialize particle network after loading
+                particleNetwork = new ParticleNetwork();
+                
+                // Remove loading screen from DOM after transition
+                setTimeout(() => {
+                    loadingScreen.remove();
+                }, 800);
+            }, 3500); // 3.5 seconds loading time
+        });
+
         // Particle Network System
         class ParticleNetwork {
             constructor() {
@@ -37,16 +57,15 @@
             createParticles() {
                 this.particles = [];
                 for (let i = 0; i < this.settings.particleCount; i++) {
-                    // Increased initial velocity range for more movement
-                    const speed = Math.random() * 1.5 + 0.5; // Speed between 0.5 and 2
-                    const angle = Math.random() * Math.PI * 2; // Random direction
+                    const speed = Math.random() * 1.5 + 0.5;
+                    const angle = Math.random() * Math.PI * 2;
                     
                     this.particles.push({
                         x: Math.random() * this.canvas.width,
                         y: Math.random() * this.canvas.height,
-                        vx: Math.cos(angle) * speed, // More dynamic initial velocity
+                        vx: Math.cos(angle) * speed,
                         vy: Math.sin(angle) * speed,
-                        baseVx: Math.cos(angle) * speed, // Store base velocity for reference
+                        baseVx: Math.cos(angle) * speed,
                         baseVy: Math.sin(angle) * speed,
                         size: Math.random() * 3 + 1,
                         color: this.settings.colors[Math.floor(Math.random() * this.settings.colors.length)],
@@ -57,40 +76,34 @@
             
             updateParticles() {
                 this.particles.forEach(particle => {
-                    // Update position
                     particle.x += particle.vx;
                     particle.y += particle.vy;
                     
-                    // Bounce off edges with some energy retention
                     if (particle.x < 0 || particle.x > this.canvas.width) {
-                        particle.vx *= -0.8; // Slight energy loss on bounce
+                        particle.vx *= -0.8;
                         particle.x = Math.max(0, Math.min(this.canvas.width, particle.x));
                     }
                     if (particle.y < 0 || particle.y > this.canvas.height) {
-                        particle.vy *= -0.8; // Slight energy loss on bounce
+                        particle.vy *= -0.8;
                         particle.y = Math.max(0, Math.min(this.canvas.height, particle.y));
                     }
                     
-                    // Mouse attraction with enhanced effect
                     const dx = this.mouse.x - particle.x;
                     const dy = this.mouse.y - particle.y;
                     const distance = Math.sqrt(dx * dx + dy * dy);
                     
                     if (distance < this.settings.mouseRadius) {
                         const force = (this.settings.mouseRadius - distance) / this.settings.mouseRadius;
-                        particle.vx += dx * force * 0.005; // Slightly stronger attraction
+                        particle.vx += dx * force * 0.005;
                         particle.vy += dy * force * 0.005;
                     }
                     
-                    // Apply gentle friction to prevent particles from stopping
-                    particle.vx *= 0.995; // Less friction for more movement
+                    particle.vx *= 0.995;
                     particle.vy *= 0.995;
                     
-                    // Add slight random movement to prevent particles from becoming static
                     particle.vx += (Math.random() - 0.5) * 0.02;
                     particle.vy += (Math.random() - 0.5) * 0.02;
                     
-                    // Limit maximum velocity to prevent particles from moving too fast
                     const maxVelocity = 3;
                     const currentSpeed = Math.sqrt(particle.vx * particle.vx + particle.vy * particle.vy);
                     if (currentSpeed > maxVelocity) {
@@ -98,7 +111,6 @@
                         particle.vy = (particle.vy / currentSpeed) * maxVelocity;
                     }
                     
-                    // Ensure minimum movement - if particle is too slow, give it a gentle push
                     const minSpeed = 0.1;
                     if (currentSpeed < minSpeed) {
                         const pushAngle = Math.random() * Math.PI * 2;
@@ -164,7 +176,6 @@
                     this.mouse.y = e.clientY;
                 });
                 
-                // Mobile touch support
                 window.addEventListener('touchmove', (e) => {
                     if (e.touches.length > 0) {
                         this.mouse.x = e.touches[0].clientX;
@@ -180,13 +191,8 @@
             }
         }
         
-        // Initialize particle network
         let particleNetwork;
-        window.addEventListener('load', () => {
-            particleNetwork = new ParticleNetwork();
-        });
         
-        // Cleanup on page unload
         window.addEventListener('beforeunload', () => {
             if (particleNetwork) {
                 particleNetwork.destroy();
@@ -219,18 +225,16 @@
             }
         });
 
-        // Show notification popup
+        // Show notification popup after loading completes
         setTimeout(() => {
             const notification = document.getElementById('notification');
             notification.classList.add('show');
             
-            // Auto hide after 5 seconds
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 5000);
-        }, 2000);
+        }, 5000); // Show after page loads + 1.5s
 
-        // Close notification function
         function closeNotification() {
             const notification = document.getElementById('notification');
             notification.classList.remove('show');
@@ -251,7 +255,6 @@
             });
         }, observerOptions);
 
-        // Observe elements for animation
         document.querySelectorAll('.portfolio-item, .content-card, .skill-card, .contact-item').forEach(el => {
             el.style.opacity = '0';
             el.style.transform = 'translateY(30px)';
@@ -298,28 +301,34 @@
         `;
         document.head.appendChild(style);
 
-        // Typing effect for hero subtitle
-        const subtitle = document.querySelector('.hero p');
-        const originalText = subtitle.textContent;
-        subtitle.textContent = '';
-        
-        let i = 0;
-        const typeWriter = () => {
-            if (i < originalText.length) {
-                subtitle.textContent += originalText.charAt(i);
-                i++;
-                setTimeout(typeWriter, 100);
+        // Typing effect for hero subtitle (after loading)
+        setTimeout(() => {
+            const subtitle = document.querySelector('.hero p');
+            if (subtitle) {
+                const originalText = subtitle.textContent;
+                subtitle.textContent = '';
+                
+                let i = 0;
+                const typeWriter = () => {
+                    if (i < originalText.length) {
+                        subtitle.textContent += originalText.charAt(i);
+                        i++;
+                        setTimeout(typeWriter, 100);
+                    }
+                };
+                
+                setTimeout(typeWriter, 1000);
             }
-        };
-        
-        setTimeout(typeWriter, 1000);
+        }, 4500);
 
         // Parallax effect for hero section
         window.addEventListener('scroll', () => {
             const scrolled = window.pageYOffset;
             const parallax = document.querySelector('.hero-content');
-            const speed = scrolled * 0.5;
-            parallax.style.transform = `translateY(${speed}px)`;
+            if (parallax) {
+                const speed = scrolled * 0.5;
+                parallax.style.transform = `translateY(${speed}px)`;
+            }
         });
 
         // Mobile menu toggle (if needed)
@@ -352,5 +361,7 @@
         };
 
         // Initialize mobile menu on load and resize
-        createMobileMenu();
+        setTimeout(() => {
+            createMobileMenu();
+        }, 4000);
         window.addEventListener('resize', createMobileMenu);
