@@ -1,4 +1,4 @@
-        * {
+                * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
@@ -12,7 +12,24 @@
             line-height: 1.6;
         }
 
-        /* Animated background particles */
+        /* Particle Network Background */
+        .particle-network {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            background: #000000;
+        }
+
+        #particle-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        /* Animated background particles overlay */
         .particles {
             position: fixed;
             top: 0;
@@ -20,7 +37,8 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            background: #000000;
+            background: transparent;
+            pointer-events: none;
         }
 
         .particles::before {
@@ -30,9 +48,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 20% 80%, rgba(255, 0, 100, 0.05) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(100, 0, 255, 0.08) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 40%, rgba(0, 100, 255, 0.04) 0%, transparent 50%);
+            background: radial-gradient(circle at 20% 80%, rgba(255, 0, 100, 0.03) 0%, transparent 50%),
+                        radial-gradient(circle at 80% 20%, rgba(100, 0, 255, 0.05) 0%, transparent 50%),
+                        radial-gradient(circle at 40% 40%, rgba(0, 100, 255, 0.02) 0%, transparent 50%);
             animation: float 6s ease-in-out infinite;
         }
 
@@ -204,7 +222,8 @@
         /* Portfolio Section */
         .portfolio-section {
             padding: 100px 40px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .portfolio-container {
@@ -231,12 +250,13 @@
         }
 
         .portfolio-item {
-            background: #000000;
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 20px;
             overflow: hidden;
             position: relative;
             border: 2px solid transparent;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
         .portfolio-item::before {
@@ -325,7 +345,8 @@
         /* Video Section */
         .video-section {
             padding: 100px 40px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .video-container {
@@ -390,7 +411,8 @@
         /* Content Creation Section */
         .content-creation-section {
             padding: 100px 40px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .content-creation-container {
@@ -424,12 +446,13 @@
         }
 
         .content-card {
-            background: #000000;
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 20px;
             padding: 40px 30px;
             border: 2px solid transparent;
             transition: all 0.3s ease;
             position: relative;
+            backdrop-filter: blur(10px);
         }
 
         .content-card::before {
@@ -480,7 +503,8 @@
         .skills-section {
             padding: 100px 40px;
             text-align: center;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .skills-section h2 {
@@ -509,13 +533,14 @@
         }
 
         .skill-card {
-            background: #000000;
+            background: rgba(0, 0, 0, 0.7);
             border: 2px solid transparent;
             border-radius: 20px;
             padding: 40px 20px;
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .skill-card::before {
@@ -558,7 +583,8 @@
         /* About Section */
         .about-section {
             padding: 100px 40px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .about-container {
@@ -589,7 +615,8 @@
         .contact-section {
             padding: 100px 40px;
             text-align: center;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
         }
 
         .contact-container {
@@ -616,11 +643,12 @@
 
         .contact-item {
             padding: 30px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.7);
             border-radius: 15px;
             border: 2px solid transparent;
             transition: all 0.3s ease;
             position: relative;
+            backdrop-filter: blur(10px);
         }
 
         .contact-item::before {
@@ -660,10 +688,11 @@
 
         /* Footer */
         .footer {
-            background: #000000;
+            background: rgba(0, 0, 0, 0.9);
             padding: 40px;
             text-align: center;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
         .footer p {
@@ -730,7 +759,7 @@
             display: inline-block;
             width: 60px;
             height: 60px;
-            background: #000000;
+            background: rgba(0, 0, 0, 0.7);
             border: 2px solid transparent;
             border-radius: 50%;
             display: flex;
@@ -742,6 +771,7 @@
             transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
+            backdrop-filter: blur(10px);
         }
 
         .social-link::before {
@@ -800,6 +830,7 @@
             transition: transform 0.3s ease;
             z-index: 1001;
             max-width: 300px;
+            backdrop-filter: blur(10px);
         }
 
         .notification.show {
