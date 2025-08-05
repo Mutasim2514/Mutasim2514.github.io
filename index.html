@@ -7,6 +7,11 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <!-- Particle Network Background -->
+    <div class="particle-network">
+        <canvas id="particle-canvas"></canvas>
+    </div>
+    
     <div class="particles"></div>
     
     <nav class="nav">
@@ -25,7 +30,7 @@
 
     <section id="home" class="hero">
         <div class="hero-content">
-            <h1>EXPLORE</h1>
+            <h1>MUTASIM</h1>
             <p>Data Science & Analytics • Frontend Web Development • Game Mechanics •Content Creator • Astrophysics</p>
             <a href="#portfolio" class="cta-button">Explore My Work</a>
             <div class="social-links">
@@ -36,7 +41,7 @@
                 </a>
                 <a href="https://github.com/Mutasim2514" target="_blank" class="social-link github" title="GitHub">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.173-.117-3.176c-.77-.112-1.391-.363-1.391-.835 0-.439.609-.629 1.379-.629.311 0 .714.044 1.124.1.265-.656.748-1.086 1.124-1.378-.455-.045-.89-.073-1.248-.073-1.557 0-2.813.702-2.813 1.864 0 .795.533 1.455 1.124 1.864-.455.408-.748 1.086-.748 1.864 0 1.378 1.124 2.49 2.813 2.49.533 0 1.024-.133 1.379-.363-.311.408-.533.951-.533 1.545 0 1.378 1.124 2.49 2.813 2.49.748 0 1.379-.408 1.847-1.086.455.678 1.124 1.086 1.847 1.086 1.69 0 2.813-1.112 2.813-2.49 0-.594-.222-1.137-.533-1.545.355.23.846.363 1.379.363 1.69 0 2.813-1.112 2.813-2.49 0-.778-.293-1.456-.748-1.864.591-.409 1.124-1.069 1.124-1.864 0-1.162-1.256-1.864-2.813-1.864-.358 0-.793.028-1.248.073.376.292.859.722 1.124 1.378.41-.056.813-.1 1.124-.1.77 0 1.379.19 1.379.629 0 .472-.621.723-1.391.835"/>
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.173 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.649.242 2.87.118 3.173.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
                     </svg>
                 </a>
                 <a href="https://www.instagram.com/mutasim_rehman/" target="_blank" class="social-link instagram" title="Instagram">
@@ -52,15 +57,15 @@
         <div class="about-container">
             <h2>About Me</h2>
             <p>I'm a Data Science student at FAST-NUCES with a multidisciplinary background in web design, game development, and Frontend web engineering. My technical journey is rooted in a deep passion for creating impactful digital solutions that merge functionality with thoughtful design.</p>
-            <p>My core areas of interest include data science, artificial intelligence, and machine learning—fields that excite me for their potential to drive innovation and transform industries. I’m constantly exploring how data can be used not just to inform decisions, but to uncover new perspectives and solve complex challenges.</p>
+            <p>My core areas of interest include data science, artificial intelligence, and machine learning—fields that excite me for their potential to drive innovation and transform industries. I'm constantly exploring how data can be used not just to inform decisions, but to uncover new perspectives and solve complex challenges.</p>
             <p>Alongside my academic and technical pursuits, I hold a deep fascination with astrophysics, driven by a desire to understand the vastness and mystery of the cosmos. This curiosity fuels both my scientific thinking and philosophical perspective on the world.</p>
-            <p>Beyond technology, I’m an active content creator with a growing portfolio of educational and creative work, ranging from coding tutorials to short films. I have a strong passion for filmmaking, storytelling, and exploring historical narratives and mythologies. These creative hobbies complement my analytical mindset and allow me to express ideas through both data and art.</p>
-            <p>Whether I’m building a data-driven application, designing a game, or directing a short film, I strive to blend technical excellence with creativity, always seeking to leave a meaningful impact through my work.</p>
+            <p>Beyond technology, I'm an active content creator with a growing portfolio of educational and creative work, ranging from coding tutorials to short films. I have a strong passion for filmmaking, storytelling, and exploring historical narratives and mythologies. These creative hobbies complement my analytical mindset and allow me to express ideas through both data and art.</p>
+            <p>Whether I'm building a data-driven application, designing a game, or directing a short film, I strive to blend technical excellence with creativity, always seeking to leave a meaningful impact through my work.</p>
         </div>
 
     </section>
 
-    <section id="portfolio" class="-sectioportfolion">
+    <section id="portfolio" class="portfolio-section">
         <div class="portfolio-container">
             <h2>Featured Projects</h2>
             <div class="portfolio-grid">
@@ -70,8 +75,8 @@
                     <div class="portfolio-image" style="background-image: url('1.png'); background-size: cover; background-position: center; height: 200px;"></div>
                         <div class="portfolio-content">
                             <h3>Hand Gesture Controlled Snake Game</h3>
-                            <p>A modern twist on the classic—this Snake game uses real-time hand tracking to control the snake’s direction. Built with MediaPipe and OpenCV, it’s an interactive blend of AI and gaming.</p>
-                            <a href="https://github.com/Mutasim2514/Gesture-Controlled-Snake-Game" class="portfolio-link">View Project</a>
+                            <p>A modern twist on the classic—this Snake game uses real-time hand tracking to control the snake's direction. Built with MediaPipe and OpenCV, it's an interactive blend of AI and gaming.</p>
+                            <a href="#" class="portfolio-link">View Project</a>
                         </div>
                 </div>
 
@@ -89,7 +94,7 @@
                         <div class="portfolio-content">
                             <h3>Gesture-Based Flappy Bird</h3><br>
                             <p>Flap your hand, not just the bird! This version of Flappy Bird replaces keyboard input with live gesture detection, offering a fun and immersive way to play.</p><br>
-                            <a href="https://github.com/Mutasim2514/Gesture-Controlled-Flappy-Bird" class="portfolio-link">View Project</a>
+                            <a href="#" class="portfolio-link">View Project</a>
                         </div>
                 </div>
 
@@ -111,7 +116,7 @@
                 <h2>Featured Video</h2>
                     <p>Watch my latest project walkthrough where I demonstrate a Flappy Bird game controlled by human gestures.</p>
                     <p>In this video, the bird flaps whenever the person flaps—using real-time hand detection powered by computer vision and Python.</p>
-                    <p>Explore how gesture control is integrated into classic gameplay, and don’t forget to subscribe to my YouTube channel for more creative tech projects and tutorials!</p>
+                    <p>Explore how gesture control is integrated into classic gameplay, and don't forget to subscribe to my YouTube channel for more creative tech projects and tutorials!</p>
 
             </div>
             <div class="video-wrapper">
