@@ -5,8 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mutasim ur Rehman</title>
     <link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <!-- Theme Transition Wave -->
+    <div class="theme-transition-wave" id="themeTransitionWave"></div>
+
     <!-- Loading Screen -->
     <div class="loading-screen" id="loadingScreen">
         <div class="loader"></div>
@@ -25,10 +29,23 @@
         
         <div class="particles"></div>
         
+        <!-- Animated Background Pattern -->
+        <div class="bg-pattern" id="bgPattern"></div>
+        
+        <!-- Floating Elements -->
+        <div class="floating-elements">
+            <div class="floating-element" style="width: 300px; height: 300px; background: var(--accent-1); top: 10%; left: 5%; animation-delay: 0s;"></div>
+            <div class="floating-element" style="width: 200px; height: 200px; background: var(--accent-2); top: 60%; left: 80%; animation-delay: 2s;"></div>
+            <div class="floating-element" style="width: 400px; height: 400px; background: var(--accent-3); top: 30%; left: 70%; animation-delay: 4s;"></div>
+        </div>
+        
         <nav class="nav">
             <div class="nav-container">
                 <div class="logo">Mutasim ur Rehman</div>
-                <div class="nav-links">
+                <button class="mobile-menu-btn" id="mobileMenuBtn">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="nav-links" id="navLinks">
                     <a href="#home">Home</a>
                     <a href="#about">About</a>
                     <a href="#portfolio">Portfolio</a>
@@ -42,42 +59,75 @@
         <section id="home" class="hero">
             <div class="hero-content">
                 <h1>MUTASIM</h1>
-                <p>Data Science & Analytics • Frontend Web Development • Game Mechanics •Content Creator • Astrophysics</p>
+                <p>Data Science & Analytics • Frontend Web Development • Game Mechanics • Content Creator • Astrophysics</p>
                 <a href="#portfolio" class="cta-button">Explore My Work</a>
                 <div class="social-links">
                     <a href="https://www.linkedin.com/in/mutasim-ur-rehman/" target="_blank" class="social-link linkedin" title="LinkedIn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
-                        </svg>
+                        <i class="fab fa-linkedin-in"></i>
                     </a>
                     <a href="https://github.com/Mutasim2514" target="_blank" class="social-link github" title="GitHub">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.173 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.649.242 2.87.118 3.173.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                        </svg>
+                        <i class="fab fa-github"></i>
                     </a>
                     <a href="https://www.instagram.com/mutasim_rehman/" target="_blank" class="social-link instagram" title="Instagram">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-                        </svg>
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                    <a href="https://www.youtube.com/" target="_blank" class="social-link youtube" title="YouTube">
+                        <i class="fab fa-youtube"></i>
                     </a>
                 </div>
+            </div>
+            <div class="scroll-down" id="scrollDown">
+                <i class="fas fa-chevron-down"></i>
             </div>
         </section>
 
         <section id="about" class="about-section">
             <div class="about-container">
-                <h2>About Me</h2>
+                <div class="section-header">
+                    <h2>About Me</h2>
+                </div>
                 <p>I'm a Data Science student at FAST-NUCES with a multidisciplinary background in web design, game development, and Frontend web engineering. My technical journey is rooted in a deep passion for creating impactful digital solutions that merge functionality with thoughtful design.</p>
                 <p>My core areas of interest include data science, artificial intelligence, and machine learning—fields that excite me for their potential to drive innovation and transform industries. I'm constantly exploring how data can be used not just to inform decisions, but to uncover new perspectives and solve complex challenges.</p>
                 <p>Alongside my academic and technical pursuits, I hold a deep fascination with astrophysics, driven by a desire to understand the vastness and mystery of the cosmos. This curiosity fuels both my scientific thinking and philosophical perspective on the world.</p>
-                <p>Beyond technology, I'm an active content creator with a growing portfolio of educational and creative work, ranging from coding tutorials to short films. I have a strong passion for filmmaking, storytelling, and exploring historical narratives and mythologies. These creative hobbies complement my analytical mindset and allow me to express ideas through both data and art.</p>
-                <p>Whether I'm building a data-driven application, designing a game, or directing a short film, I strive to blend technical excellence with creativity, always seeking to leave a meaningful impact through my work.</p>
+                
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">2022 - Present</div>
+                            <h3>FAST-NUCES</h3>
+                            <p>Bachelor's in Data Science with focus on AI and machine learning.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">2020 - 2022</div>
+                            <h3>Game Development</h3>
+                            <p>Developed multiple interactive games using Python and C++.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">2018 - 2020</div>
+                            <h3>Web Development</h3>
+                            <p>Started learning frontend technologies and building websites.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <div class="timeline-date">2016 - 2018</div>
+                            <h3>Content Creation</h3>
+                            <p>Began creating educational content and short films.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </section>
 
         <section id="portfolio" class="portfolio-section">
             <div class="portfolio-container">
-                <h2>Featured Projects</h2>
+                <div class="section-header">
+                    <h2>Featured Projects</h2>
+                </div>
                 <div class="portfolio-grid">
                     <div class="portfolio-item">
                         <div class="portfolio-image" style="background-image: url('1.png'); background-size: cover; background-position: center; height: 200px;"></div>
@@ -91,7 +141,7 @@
                     <div class="portfolio-item">
                         <div class="portfolio-image" style="background-image: url('2.png'); background-size: cover; background-position: center; height: 200px;"></div>
                             <div class="portfolio-content">
-                                <h3>Xonix: Territory Capture Game</h3><br>
+                                <h3>Xonix: Territory Capture Game</h3>
                                 <p>Inspired by the arcade classic, this game challenges you to trap and conquer space while avoiding enemies. Built from scratch, it features levels, custom logic, and retro strategy gameplay.</p>
                                 <a href="https://github.com/Mutasim2514/xonix-2d" target="_blank" class="portfolio-link">View Project</a>
                             </div>
@@ -100,8 +150,8 @@
                     <div class="portfolio-item">
                         <div class="portfolio-image" style="background-image: url('3.png'); background-size: cover; background-position: center; height: 200px;"></div>
                             <div class="portfolio-content">
-                                <h3>Gesture-Based Flappy Bird</h3><br>
-                                <p>Flap your hand, not just the bird! This version of Flappy Bird replaces keyboard input with live gesture detection, offering a fun and immersive way to play.</p><br>
+                                <h3>Gesture-Based Flappy Bird</h3>
+                                <p>Flap your hand, not just the bird! This version of Flappy Bird replaces keyboard input with live gesture detection, offering a fun and immersive way to play.</p>
                                 <a href="https://github.com/Mutasim2514/Gesture-Controlled-Flappy-Bird" target="_blank" class="portfolio-link">View Project</a>
                             </div>
                     </div>
@@ -128,23 +178,25 @@
 
         <section id="content-creation" class="content-creation-section">
             <div class="content-creation-container">
-                <h2>Content Creation</h2>
+                <div class="section-header">
+                    <h2>Content Creation</h2>
+                </div>
                 <p>Sharing knowledge and inspiring the next generation of developers through engaging content across multiple platforms.</p>
                 <p>[Will be Shared soon]</p>
                 
                 <div class="content-grid">
                     <div class="content-card">
-                        <div class="content-icon">📝</div>
+                        <div class="content-icon"><i class="fas fa-pen-fancy"></i></div>
                         <h3>Technical Writing</h3>
                         <p>In-depth articles on modern development practices, emerging technologies, and industry insights.</p>
                     </div>
                     <div class="content-card">
-                        <div class="content-icon">🎙️</div>
-                        <h3>Tech Talks</h3>
-                        <p>Speaking engagements and webinars covering the latest trends in software development and technology.</p>
+                        <div class="content-icon"><i class="fas fa-video"></i></div>
+                        <h3>Video Tutorials</h3>
+                        <p>Step-by-step guides on game development, data science, and web technologies.</p>
                     </div>
                     <div class="content-card">
-                        <div class="content-icon">💡</div>
+                        <div class="content-icon"><i class="fas fa-code-branch"></i></div>
                         <h3>Open Source</h3>
                         <p>Contributing to open-source projects and maintaining libraries that help the developer community.</p>
                     </div>
@@ -154,25 +206,53 @@
 
         <section id="skills" class="skills-section">
             <div class="skills-container">
-                <h2>Skills & Technologies</h2>
+                <div class="section-header">
+                    <h2>Skills & Technologies</h2>
+                </div>
                 <p>Expertise across the full development stack with focus on modern, scalable technologies.</p>
                 
                 <div class="skills-grid">
                     <div class="skill-card">
                         <h3>Frontend</h3>
-                        <p>Crafting responsive, user-friendly web interfaces.</p>
+                        <p>HTML5, CSS3, JavaScript, React, Vue.js</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="90"></div>
+                        </div>
                     </div>
                     <div class="skill-card">
-                        <h3>Game Mechanics</h3>
-                        <p>Designing interactive and engaging gameplay experiences.</p>
+                        <h3>Game Development</h3>
+                        <p>Unity, C++, Python, Game Mechanics</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="85"></div>
+                        </div>
                     </div>
                     <div class="skill-card">
-                        <h3>C++ | Python</h3>
-                        <p>Efficient problem-solving using versatile, performance-driven code.</p>
+                        <h3>Data Science</h3>
+                        <p>Python, R, Machine Learning, Data Visualization</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="80"></div>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Backend</h3>
+                        <p>Node.js, Express, MongoDB, SQL</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="75"></div>
+                        </div>
                     </div>
                     <div class="skill-card">
                         <h3>Tools</h3>
-                        <p>Git, VS Code, Figma, Ubantu, MS Office</p>
+                        <p>Git, VS Code, Figma, Ubuntu, Docker</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="88"></div>
+                        </div>
+                    </div>
+                    <div class="skill-card">
+                        <h3>Creative</h3>
+                        <p>Adobe Premiere, Blender, Content Creation</p>
+                        <div class="skill-progress">
+                            <div class="skill-progress-bar" data-percent="70"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,8 +260,28 @@
 
         <section id="contact" class="contact-section">
             <div class="contact-container">
-                <h2>Let's Connect</h2>
+                <div class="section-header">
+                    <h2>Let's Connect</h2>
+                </div>
                 <p>Ready to collaborate on your next project or discuss innovative tech solutions? Let's talk!</p>
+                
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" id="name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="message">Message</label>
+                            <textarea id="message" class="form-control" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-btn">Send Message</button>
+                    </form>
+                </div>
                 
                 <div class="contact-info">
                     <div class="contact-item">
@@ -206,6 +306,16 @@
             </div>
         </footer>
 
+        <!-- Back to Top Button -->
+        <a href="#home" class="back-to-top" id="backToTop">
+            <i class="fas fa-arrow-up"></i>
+        </a>
+
+        <!-- Dark Mode Toggle -->
+        <div class="dark-mode-toggle" id="darkModeToggle">
+            <i class="fas fa-moon"></i>
+        </div>
+
         <!-- Notification Popup -->
         <div id="notification" class="notification">
             <button class="notification-close" onclick="closeNotification()">&times;</button>
@@ -217,4 +327,5 @@
 	<script src="function.js"></script>  
 </body>
 </html>
+
 
