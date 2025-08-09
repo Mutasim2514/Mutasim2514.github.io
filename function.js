@@ -518,8 +518,8 @@
             // Here you would typically send the form data to a server
             // For demonstration, we'll just show a notification
             const notification = document.getElementById('notification');
-            notification.querySelector('h4').textContent = 'Message Sent!';
-            notification.querySelector('p').textContent = 'Thank you for reaching out. I will get back to you soon.';
+            notification.querySelector('h4').textContent = 'Message Not Sent!';
+            notification.querySelector('p').textContent = 'This feature is not fully developed right now!';
             notification.classList.add('show');
             
             // Reset form
@@ -531,3 +531,4 @@
             }, 5000);
         });
     });
+
