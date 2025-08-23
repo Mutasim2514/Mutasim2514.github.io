@@ -1116,7 +1116,7 @@
                 const statGrid = document.getElementById('stat-grid');
 
                 // Set planet GIF background
-                planetDisplay.style.backgroundImage = `url('gifs/${planet.name.toLowerCase()}.gif')`;
+                planetDisplay.style.backgroundImage = `url('{planet.name.toLowerCase()}.gif')`;
                 
                 // Set planet info
                 planetTitle.textContent = planet.name;
@@ -1440,4 +1440,5 @@
         });
     </script>
 </body>
+
 </html>
