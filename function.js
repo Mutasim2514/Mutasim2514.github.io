@@ -1,4 +1,4 @@
-    // Loading Screen Management
+            // Loading Screen Management
     window.addEventListener('load', () => {
         // Simulate loading time for better UX
         setTimeout(() => {
@@ -142,6 +142,8 @@
             document.querySelector('#darkModeToggle i').classList.add('fa-sun');
         }
     }
+
+    
 
     // Particle Network System
     class ParticleNetwork {
@@ -531,4 +533,3 @@
             }, 5000);
         });
     });
-
