@@ -1,0 +1,1443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="s2.png" type="image/png">
+    <title>Solar Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(ellipse at center, #0f0f23 0%, #000 70%);
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            height: 100vh;
+        }
+
+        #canvas-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        canvas {
+            display: block;
+            cursor: grab;
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        #ui-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        #title {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 2.5em;
+            font-weight: 300;
+            text-align: center;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed, #ec4899, #f59e0b);
+            background-size: 300% 300%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientFlow 6s ease infinite;
+            pointer-events: none;
+            text-shadow: 0 0 30px rgba(79, 70, 229, 0.3);
+        }
+
+        @keyframes gradientFlow {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #controls {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(20px);
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+
+        .control-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            background: linear-gradient(135deg, #5b52e8 0%, #8b4cf0 100%);
+        }
+
+        #planet-detail {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a1a2e 100%);
+            display: none;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            pointer-events: auto;
+        }
+
+        #planet-detail.active {
+            display: flex;
+            opacity: 1;
+        }
+
+        #planet-view {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(255,255,255,0.02) 0%, transparent 70%);
+        }
+
+        #planet-display {
+            width: 80vh;
+            height: 80vh;
+            max-width: 600px;
+            max-height: 600px;
+            border-radius: 50%;
+            background-size: cover;
+            background-position: center;
+            animation: planetRotate 20s linear infinite;
+            box-shadow: 0 0 100px rgba(255, 255, 255, 0.3);
+            filter: drop-shadow(0 0 50px rgba(255, 255, 255, 0.2));
+        }
+
+        @keyframes planetRotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        #planet-info {
+            width: 50%;
+            height: 100%;
+            padding: 80px 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            position: relative;
+            overflow-y: auto;
+        }
+
+        #planet-title {
+            font-size: 4em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, #667eea, #764ba2, #f093fb, #f5576c);
+            background-size: 400% 400%;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: gradientShift 3s ease infinite;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        #planet-subtitle {
+            font-size: 1.4em;
+            color: #888;
+            margin-bottom: 40px;
+        }
+
+        .stat-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-3px);
+        }
+
+        .stat-label {
+            font-size: 1em;
+            color: #00ff88;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.4em;
+            color: white;
+            font-weight: bold;
+        }
+
+        #back-button {
+            position: absolute;
+            top: 40px;
+            right: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            padding: 20px 35px;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        #back-button:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(102, 126, 234, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            pointer-events: none;
+            z-index: 200;
+            transform: translate(-50%, -120%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .tooltip.show {
+            opacity: 1;
+        }
+
+        #zoom-indicator {
+            position: absolute;
+            top: 80px;
+            left: 30px;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: #a1a1aa;
+            pointer-events: none;
+        }
+
+        #time-controls {
+            position: absolute;
+            top: 80px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            background: rgba(15, 15, 35, 0.8);
+            backdrop-filter: blur(10px);
+            padding: 15px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            pointer-events: auto;
+        }
+
+        .time-btn {
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+            border: none;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .time-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(79, 70, 229, 0.3);
+            background: linear-gradient(135deg, #5b52e8 0%, #8b4cf0 100%);
+        }
+
+        .time-btn.active {
+            background: linear-gradient(135deg, #00ff88 0%, #00cc6a 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 136, 0.4);
+        }
+
+        #time-display {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            color: #a1a1aa;
+        }
+
+        @media (max-width: 768px) {
+            #planet-detail {
+                flex-direction: column;
+            }
+            
+            #planet-view, #planet-info {
+                width: 100%;
+                height: 50%;
+            }
+            
+            #planet-display {
+                width: 60vh;
+                height: 60vh;
+                max-width: 400px;
+                max-height: 400px;
+            }
+            
+            #planet-title {
+                font-size: 2.5em;
+            }
+            
+            #time-controls {
+                top: 120px;
+                right: 15px;
+                flex-direction: row;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="canvas-container">
+        <canvas id="solarCanvas"></canvas>
+        
+        <div id="ui-overlay">
+            <h1 id="title">Solar System Explorer</h1>
+            
+            <div id="zoom-indicator">
+                Zoom: <span id="zoom-level">1x</span> | Scale: Realistic
+            </div>
+            
+            <div id="time-controls">
+                <button class="time-btn" id="time-normal">Normal Time</button>
+                <button class="time-btn active" id="time-1sec-day">1 Sec = 1 Day</button>
+                <button class="time-btn" id="time-1sec-week">1 Sec = 1 Week</button>
+                <button class="time-btn" id="time-1sec-month">1 Sec = 1 Month</button>
+                <div id="time-display">Time Scale: 1 Sec = 1 Day</div>
+            </div>
+            
+            <div id="controls">
+                <button class="control-btn" id="reset-view">Home</button>
+                <button class="control-btn" id="toggle-animation">Pause</button>
+                <button class="control-btn" id="toggle-orbits">Orbits</button>
+                <button class="control-btn" id="toggle-labels">Labels</button>
+                <button class="control-btn" id="toggle-moons">Moons</button>
+                <button class="control-btn" id="toggle-asteroids">Asteroids</button>
+            </div>
+        </div>
+        
+        <div class="tooltip" id="tooltip"></div>
+    </div>
+
+    <div id="planet-detail">
+        <div id="planet-view">
+            <div id="planet-display"></div>
+        </div>
+        <div id="planet-info">
+            <button id="back-button">← Back to Solar System</button>
+            <h1 id="planet-title">Planet Name</h1>
+            <p id="planet-subtitle">Planet Type</p>
+            <div class="stat-grid" id="stat-grid"></div>
+        </div>
+    </div>
+
+    <script>
+        class SolarSystem {
+            constructor() {
+                this.canvas = document.getElementById('solarCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.tooltip = document.getElementById('tooltip');
+                this.planetDetail = document.getElementById('planet-detail');
+                
+                // Viewport settings
+                this.camera = {
+                    x: 0,
+                    y: 0,
+                    zoom: 1,
+                    targetZoom: 1,
+                    targetX: 0,
+                    targetY: 0
+                };
+                
+                // Interaction
+                this.mouse = { x: 0, y: 0, down: false, lastX: 0, lastY: 0 };
+                this.hoveredPlanet = null;
+                
+                // Animation
+                this.time = 0;
+                this.animationSpeed = 0.001;
+                this.showOrbits = true;
+                this.showLabels = true;
+                this.showMoons = false;
+                this.showAsteroids = true;
+                this.animationPaused = false;
+                
+                // Time scaling
+                this.timeScale = 1;
+                this.timeScaleOptions = {
+                    'normal': 0.001,
+                    '1sec-day': 1,
+                    '1sec-week': 7,
+                    '1sec-month': 30
+                };
+                this.currentTimeScale = '1sec-day';
+                
+                this.initCanvas();
+                this.initPlanets();
+                this.initAsteroidBelts();
+                this.initEvents();
+                this.loadPlanetTextures();
+                this.animate();
+            }
+            
+            initCanvas() {
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+            }
+            
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+            }
+            
+            initPlanets() {
+                this.planets = [
+                    {
+                        name: 'Sun',
+                        radius: 15,
+                        distance: 0,
+                        speed: 0,
+                        color: '#FDB813',
+                        glowColor: '#FF8C00',
+                        texture: null,
+                        info: {
+                            type: 'G-type Star',
+                            diameter: '1,392,700 km',
+                            mass: '1.989 × 10³⁰ kg',
+                            temperature: '5,778 K (5,505°C)',
+                            age: '4.6 billion years',
+                            composition: '73% Hydrogen, 25% Helium',
+                            luminosity: '3.828 × 10²⁶ watts'
+                        }
+                    },
+                    {
+                        name: 'Mercury',
+                        radius: 1.2,
+                        distance: 58,
+                        speed: 4.1,
+                        color: '#8C7853',
+                        angle: 0,
+                        texture: null,
+                        info: {
+                            type: 'Terrestrial Planet',
+                            diameter: '4,879 km',
+                            mass: '3.30 × 10²³ kg',
+                            distance: '57.9 million km from Sun',
+                            day: '58.6 Earth days',
+                            year: '88 Earth days',
+                            temperature: '-173°C to 427°C',
+                            moons: '0'
+                        }
+                    },
+                    {
+                        name: 'Venus',
+                        radius: 3,
+                        distance: 108,
+                        speed: 1.6,
+                        color: '#FFC649',
+                        angle: Math.PI * 0.3,
+                        texture: null,
+                        info: {
+                            type: 'Terrestrial Planet',
+                            diameter: '12,104 km',
+                            mass: '4.87 × 10²⁴ kg',
+                            distance: '108.2 million km from Sun',
+                            day: '243 Earth days (retrograde)',
+                            year: '225 Earth days',
+                            temperature: '462°C average',
+                            moons: '0'
+                        }
+                    },
+                    {
+                        name: 'Earth',
+                        radius: 3.2,
+                        distance: 150,
+                        speed: 1,
+                        color: '#6B93D6',
+                        secondaryColor: '#4F7942',
+                        angle: Math.PI * 0.6,
+                        texture: null,
+                        moons: [
+                            {
+                                name: 'Moon',
+                                radius: 0.9,
+                                distance: 15,
+                                speed: 13.2,
+                                color: '#C0C0C0',
+                                angle: 0
+                            }
+                        ],
+                        info: {
+                            type: 'Terrestrial Planet',
+                            diameter: '12,756 km',
+                            mass: '5.97 × 10²⁴ kg',
+                            distance: '149.6 million km from Sun',
+                            day: '24 hours',
+                            year: '365.25 days',
+                            temperature: '-89°C to 58°C',
+                            moons: '1 (The Moon)'
+                        }
+                    },
+                    {
+                        name: 'Mars',
+                        radius: 1.7,
+                        distance: 228,
+                        speed: 0.5,
+                        color: '#CD5C5C',
+                        angle: Math.PI,
+                        texture: null,
+                        moons: [
+                            {
+                                name: 'Phobos',
+                                radius: 0.3,
+                                distance: 8,
+                                speed: 1126.3,
+                                color: '#8B7355',
+                                angle: 0
+                            },
+                            {
+                                name: 'Deimos',
+                                radius: 0.2,
+                                distance: 12,
+                                speed: 285.9,
+                                color: '#696969',
+                                angle: Math.PI
+                            }
+                        ],
+                        info: {
+                            type: 'Terrestrial Planet',
+                            diameter: '6,792 km',
+                            mass: '6.42 × 10²³ kg',
+                            distance: '227.9 million km from Sun',
+                            day: '24.6 hours',
+                            year: '687 Earth days',
+                            temperature: '-87°C to -5°C',
+                            moons: '2 (Phobos, Deimos)'
+                        }
+                    },
+                    {
+                        name: 'Jupiter',
+                        radius: 35,
+                        distance: 779,
+                        speed: 0.08,
+                        color: '#D8CA9D',
+                        secondaryColor: '#B8860B',
+                        angle: Math.PI * 1.3,
+                        texture: null,
+                        moons: [
+                            // Galilean moons
+                            {
+                                name: 'Io',
+                                radius: 0.9,
+                                distance: 42,
+                                speed: 21.3,
+                                color: '#FFFF99',
+                                angle: 0
+                            },
+                            {
+                                name: 'Europa',
+                                radius: 0.8,
+                                distance: 50,
+                                speed: 12.7,
+                                color: '#B0E0E6',
+                                angle: Math.PI * 0.5
+                            },
+                            {
+                                name: 'Ganymede',
+                                radius: 1.3,
+                                distance: 58,
+                                speed: 7.2,
+                                color: '#A0A0A0',
+                                angle: Math.PI
+                            },
+                            {
+                                name: 'Callisto',
+                                radius: 1.2,
+                                distance: 68,
+                                speed: 3.2,
+                                color: '#808080',
+                                angle: Math.PI * 1.5
+                            },
+                            // Additional major moons
+                            {
+                                name: 'Amalthea',
+                                radius: 0.4,
+                                distance: 38,
+                                speed: 48.6,
+                                color: '#D2B48C',
+                                angle: Math.PI * 0.2
+                            },
+                            {
+                                name: 'Himalia',
+                                radius: 0.3,
+                                distance: 95,
+                                speed: 0.48,
+                                color: '#A9A9A9',
+                                angle: Math.PI * 0.7
+                            },
+                            {
+                                name: 'Lysithea',
+                                radius: 0.2,
+                                distance: 105,
+                                speed: 0.28,
+                                color: '#C0C0C0',
+                                angle: Math.PI * 1.1
+                            },
+                            {
+                                name: 'Elara',
+                                radius: 0.2,
+                                distance: 100,
+                                speed: 0.35,
+                                color: '#B8860B',
+                                angle: Math.PI * 1.8
+                            }
+                        ],
+                        info: {
+                            type: 'Gas Giant',
+                            diameter: '142,984 km',
+                            mass: '1.90 × 10²⁷ kg',
+                            distance: '778.5 million km from Sun',
+                            day: '9.9 hours',
+                            year: '11.9 Earth years',
+                            temperature: '-108°C average',
+                            moons: '95+ known moons (4 major Galilean moons)'
+                        }
+                    },
+                    {
+                        name: 'Saturn',
+                        radius: 29,
+                        distance: 1432,
+                        speed: 0.03,
+                        color: '#FAD5A5',
+                        hasRings: true,
+                        angle: Math.PI * 1.7,
+                        texture: null,
+                        moons: [
+                            // Major moons
+                            {
+                                name: 'Titan',
+                                radius: 1.3,
+                                distance: 55,
+                                speed: 4.4,
+                                color: '#FFA500',
+                                angle: 0
+                            },
+                            {
+                                name: 'Rhea',
+                                radius: 0.7,
+                                distance: 45,
+                                speed: 8.4,
+                                color: '#C0C0C0',
+                                angle: Math.PI * 0.3
+                            },
+                            {
+                                name: 'Iapetus',
+                                radius: 0.7,
+                                distance: 85,
+                                speed: 0.9,
+                                color: '#696969',
+                                angle: Math.PI * 1.2
+                            },
+                            {
+                                name: 'Dione',
+                                radius: 0.6,
+                                distance: 40,
+                                speed: 11.2,
+                                color: '#F8F8FF',
+                                angle: Math.PI * 0.6
+                            },
+                            {
+                                name: 'Tethys',
+                                radius: 0.5,
+                                distance: 35,
+                                speed: 15.9,
+                                color: '#E6E6FA',
+                                angle: Math.PI * 0.9
+                            },
+                            {
+                                name: 'Enceladus',
+                                radius: 0.6,
+                                distance: 38,
+                                speed: 16.7,
+                                color: '#F8F8FF',
+                                angle: Math.PI * 0.4
+                            },
+                            {
+                                name: 'Mimas',
+                                radius: 0.5,
+                                distance: 32,
+                                speed: 22.6,
+                                color: '#D3D3D3',
+                                angle: Math.PI * 0.7
+                            },
+                            {
+                                name: 'Hyperion',
+                                radius: 0.4,
+                                distance: 60,
+                                speed: 5.8,
+                                color: '#8B7765',
+                                angle: Math.PI * 1.5
+                            },
+                            {
+                                name: 'Phoebe',
+                                radius: 0.3,
+                                distance: 120,
+                                speed: -0.48,
+                                color: '#696969',
+                                angle: Math.PI * 0.1
+                            }
+                        ],
+                        info: {
+                            type: 'Gas Giant',
+                            diameter: '120,536 km',
+                            mass: '5.68 × 10²⁶ kg',
+                            distance: '1.43 billion km from Sun',
+                            day: '10.7 hours',
+                            year: '29.4 Earth years',
+                            temperature: '-139°C average',
+                            moons: '146+ known moons (Major: Titan, Rhea, Iapetus)'
+                        }
+                    },
+                    {
+                        name: 'Uranus',
+                        radius: 13,
+                        distance: 2867,
+                        speed: 0.01,
+                        color: '#4FD0E4',
+                        angle: Math.PI * 0.1,
+                        texture: null,
+                        moons: [
+                            // Major moons
+                            {
+                                name: 'Titania',
+                                radius: 0.7,
+                                distance: 28,
+                                speed: 4.7,
+                                color: '#C0C0C0',
+                                angle: 0
+                            },
+                            {
+                                name: 'Oberon',
+                                radius: 0.6,
+                                distance: 32,
+                                speed: 3.4,
+                                color: '#A9A9A9',
+                                angle: Math.PI * 0.4
+                            },
+                            {
+                                name: 'Ariel',
+                                radius: 0.5,
+                                distance: 22,
+                                speed: 10.4,
+                                color: '#DCDCDC',
+                                angle: Math.PI * 0.8
+                            },
+                            {
+                                name: 'Umbriel',
+                                radius: 0.5,
+                                distance: 25,
+                                speed: 7.1,
+                                color: '#708090',
+                                angle: Math.PI * 1.2
+                            },
+                            {
+                                name: 'Miranda',
+                                radius: 0.3,
+                                distance: 18,
+                                speed: 20.8,
+                                color: '#BC8F8F',
+                                angle: Math.PI * 1.6
+                            },
+                            // Smaller moons
+                            {
+                                name: 'Puck',
+                                radius: 0.2,
+                                distance: 16,
+                                speed: 26.4,
+                                color: '#778899',
+                                angle: Math.PI * 0.2
+                            },
+                            {
+                                name: 'Portia',
+                                radius: 0.2,
+                                distance: 15,
+                                speed: 28.8,
+                                color: '#696969',
+                                angle: Math.PI * 0.6
+                            },
+                            {
+                                name: 'Juliet',
+                                radius: 0.1,
+                                distance: 14,
+                                speed: 32.1,
+                                color: '#A9A9A9',
+                                angle: Math.PI * 1.0
+                            }
+                        ],
+                        info: {
+                            type: 'Ice Giant',
+                            diameter: '51,118 km',
+                            mass: '8.68 × 10²⁵ kg',
+                            distance: '2.87 billion km from Sun',
+                            day: '17.2 hours',
+                            year: '84 Earth years',
+                            temperature: '-197°C average',
+                            moons: '27+ known moons (Major: Titania, Oberon, Ariel, Umbriel, Miranda)'
+                        }
+                    },
+                    {
+                        name: 'Neptune',
+                        radius: 12,
+                        distance: 4515,
+                        speed: 0.006,
+                        color: '#4B70DD',
+                        angle: Math.PI * 0.8,
+                        texture: null,
+                        moons: [
+                            {
+                                name: 'Triton',
+                                radius: 0.9,
+                                distance: 28,
+                                speed: -15.9,
+                                color: '#F5F5DC',
+                                angle: 0
+                            },
+                            {
+                                name: 'Nereid',
+                                radius: 0.3,
+                                distance: 45,
+                                speed: 0.7,
+                                color: '#C0C0C0',
+                                angle: Math.PI
+                            },
+                            {
+                                name: 'Proteus',
+                                radius: 0.4,
+                                distance: 20,
+                                speed: 36.8,
+                                color: '#808080',
+                                angle: Math.PI * 0.5
+                            },
+                            {
+                                name: 'Larissa',
+                                radius: 0.2,
+                                distance: 18,
+                                speed: 43.2,
+                                color: '#A9A9A9',
+                                angle: Math.PI * 1.3
+                            },
+                            {
+                                name: 'Galatea',
+                                radius: 0.2,
+                                distance: 16,
+                                speed: 52.6,
+                                color: '#696969',
+                                angle: Math.PI * 1.7
+                            }
+                        ],
+                        info: {
+                            type: 'Ice Giant',
+                            diameter: '49,528 km',
+                            mass: '1.02 × 10²⁶ kg',
+                            distance: '4.5 billion km from Sun',
+                            day: '16.1 hours',
+                            year: '165 Earth years',
+                            temperature: '-201°C average',
+                            moons: '16+ known moons (Major: Triton, Proteus, Nereid)'
+                        }
+                    }
+                ];
+            }
+            
+            initAsteroidBelts() {
+                this.asteroidBelts = [
+                    // Main Asteroid Belt (between Mars and Jupiter)
+                    {
+                        name: 'Main Belt',
+                        innerRadius: 320, // ~2.2 AU
+                        outerRadius: 550, // ~3.6 AU
+                        density: 800,
+                        asteroids: []
+                    },
+                    // Kuiper Belt (beyond Neptune)
+                    {
+                        name: 'Kuiper Belt',
+                        innerRadius: 4800, // ~30 AU
+                        outerRadius: 7500, // ~50 AU
+                        density: 400,
+                        asteroids: []
+                    }
+                ];
+                
+                // Generate asteroids for each belt
+                this.asteroidBelts.forEach(belt => {
+                    for (let i = 0; i < belt.density; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const distance = belt.innerRadius + Math.random() * (belt.outerRadius - belt.innerRadius);
+                        const size = Math.random() * 1.5 + 0.5;
+                        const speed = Math.random() * 0.1 + 0.05; // Slow orbital speeds
+                        
+                        belt.asteroids.push({
+                            angle: angle,
+                            distance: distance,
+                            size: size,
+                            speed: speed * (belt.name === 'Kuiper Belt' ? 0.3 : 1), // Kuiper objects move slower
+                            color: belt.name === 'Kuiper Belt' ? 
+                                   `hsl(${180 + Math.random() * 60}, 30%, ${20 + Math.random() * 30}%)` : // Icy blue-gray
+                                   `hsl(${30 + Math.random() * 30}, 40%, ${30 + Math.random() * 40}%)`,  // Rocky brown
+                            opacity: Math.random() * 0.6 + 0.4
+                        });
+                    }
+                });
+            }
+            
+            loadPlanetTextures() {
+                this.planets.forEach(planet => {
+                    const img = new Image();
+                    img.onload = () => {
+                        planet.texture = img;
+                    };
+                    img.src = `gifs/${planet.name.toLowerCase()}.gif`;
+                });
+            }
+            
+            initEvents() {
+                // Mouse events
+                this.canvas.addEventListener('mousedown', (e) => this.handleMouseDown(e));
+                this.canvas.addEventListener('mousemove', (e) => this.handleMouseMove(e));
+                this.canvas.addEventListener('mouseup', (e) => this.handleMouseUp(e));
+                this.canvas.addEventListener('wheel', (e) => this.handleWheel(e));
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+                
+                // UI events
+                document.getElementById('reset-view').addEventListener('click', () => this.resetView());
+                document.getElementById('toggle-animation').addEventListener('click', () => this.toggleAnimation());
+                document.getElementById('toggle-orbits').addEventListener('click', () => this.toggleOrbits());
+                document.getElementById('toggle-labels').addEventListener('click', () => this.toggleLabels());
+                document.getElementById('toggle-moons').addEventListener('click', () => this.toggleMoons());
+                document.getElementById('toggle-asteroids').addEventListener('click', () => this.toggleAsteroids());
+                document.getElementById('back-button').addEventListener('click', () => this.closePlanetDetail());
+                
+                // Time scale events
+                document.getElementById('time-normal').addEventListener('click', () => this.setTimeScale('normal'));
+                document.getElementById('time-1sec-day').addEventListener('click', () => this.setTimeScale('1sec-day'));
+                document.getElementById('time-1sec-week').addEventListener('click', () => this.setTimeScale('1sec-week'));
+                document.getElementById('time-1sec-month').addEventListener('click', () => this.setTimeScale('1sec-month'));
+            }
+            
+            setTimeScale(scale) {
+                this.currentTimeScale = scale;
+                this.timeScale = this.timeScaleOptions[scale];
+                
+                // Update UI
+                document.querySelectorAll('.time-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.getElementById(`time-${scale}`).classList.add('active');
+                
+                // Update time display
+                const timeDisplay = document.getElementById('time-display');
+                switch(scale) {
+                    case 'normal':
+                        timeDisplay.textContent = 'Time Scale: Normal';
+                        break;
+                    case '1sec-day':
+                        timeDisplay.textContent = 'Time Scale: 1 Sec = 1 Day';
+                        break;
+                    case '1sec-week':
+                        timeDisplay.textContent = 'Time Scale: 1 Sec = 1 Week';
+                        break;
+                    case '1sec-month':
+                        timeDisplay.textContent = 'Time Scale: 1 Sec = 1 Month';
+                        break;
+                }
+            }
+            
+            handleMouseDown(e) {
+                this.mouse.down = true;
+                this.mouse.lastX = e.clientX;
+                this.mouse.lastY = e.clientY;
+            }
+            
+            handleMouseMove(e) {
+                this.mouse.x = e.clientX;
+                this.mouse.y = e.clientY;
+                
+                if (this.mouse.down) {
+                    const deltaX = e.clientX - this.mouse.lastX;
+                    const deltaY = e.clientY - this.mouse.lastY;
+                    
+                    this.camera.targetX += deltaX / this.camera.zoom;
+                    this.camera.targetY += deltaY / this.camera.zoom;
+                    
+                    this.mouse.lastX = e.clientX;
+                    this.mouse.lastY = e.clientY;
+                } else {
+                    this.checkHover(e.clientX, e.clientY);
+                }
+            }
+            
+            handleMouseUp(e) {
+                this.mouse.down = false;
+            }
+            
+            handleWheel(e) {
+                e.preventDefault();
+                const zoomFactor = e.deltaY > 0 ? 0.9 : 1.1;
+                this.camera.targetZoom = Math.max(0.1, Math.min(50, this.camera.targetZoom * zoomFactor));
+            }
+            
+            handleClick(e) {
+                const planet = this.getPlanetAtPosition(e.clientX, e.clientY);
+                if (planet) {
+                    this.showPlanetDetail(planet);
+                }
+            }
+            
+            checkHover(mouseX, mouseY) {
+                const planet = this.getPlanetAtPosition(mouseX, mouseY);
+                
+                if (planet !== this.hoveredPlanet) {
+                    this.hoveredPlanet = planet;
+                    
+                    if (planet) {
+                        this.showTooltip(planet.name, mouseX, mouseY);
+                    } else {
+                        this.hideTooltip();
+                    }
+                }
+                
+                if (planet && this.tooltip.classList.contains('show')) {
+                    this.tooltip.style.left = mouseX + 'px';
+                    this.tooltip.style.top = mouseY + 'px';
+                }
+            }
+            
+            getPlanetAtPosition(mouseX, mouseY) {
+                const centerX = this.canvas.width / 2 + this.camera.x * this.camera.zoom;
+                const centerY = this.canvas.height / 2 + this.camera.y * this.camera.zoom;
+                
+                for (const planet of this.planets) {
+                    const planetX = centerX + Math.cos(planet.angle || 0) * planet.distance * this.camera.zoom;
+                    const planetY = centerY + Math.sin(planet.angle || 0) * planet.distance * this.camera.zoom;
+                    
+                    const distance = Math.sqrt((mouseX - planetX) ** 2 + (mouseY - planetY) ** 2);
+                    const hitRadius = Math.max(planet.radius * this.camera.zoom, 8);
+                    
+                    if (distance < hitRadius) {
+                        return planet;
+                    }
+                }
+                return null;
+            }
+            
+            showTooltip(text, x, y) {
+                this.tooltip.textContent = text;
+                this.tooltip.style.left = x + 'px';
+                this.tooltip.style.top = y + 'px';
+                this.tooltip.classList.add('show');
+            }
+            
+            hideTooltip() {
+                this.tooltip.classList.remove('show');
+            }
+            
+            showPlanetDetail(planet) {
+                const planetDisplay = document.getElementById('planet-display');
+                const planetTitle = document.getElementById('planet-title');
+                const planetSubtitle = document.getElementById('planet-subtitle');
+                const statGrid = document.getElementById('stat-grid');
+
+                // Set planet GIF background
+                planetDisplay.style.backgroundImage = `url('gifs/${planet.name.toLowerCase()}.gif')`;
+                
+                // Set planet info
+                planetTitle.textContent = planet.name;
+                planetSubtitle.textContent = planet.info.type;
+                
+                // Create stat cards
+                statGrid.innerHTML = '';
+                Object.entries(planet.info).forEach(([key, value]) => {
+                    if (key !== 'type') {
+                        const statCard = document.createElement('div');
+                        statCard.className = 'stat-card';
+                        statCard.innerHTML = `
+                            <div class="stat-label">${key.replace(/([A-Z])/g, ' $1')}</div>
+                            <div class="stat-value">${value}</div>
+                        `;
+                        statGrid.appendChild(statCard);
+                    }
+                });
+
+                this.planetDetail.classList.add('active');
+            }
+            
+            closePlanetDetail() {
+                this.planetDetail.classList.remove('active');
+            }
+            
+            resetView() {
+                this.camera.targetX = 0;
+                this.camera.targetY = 0;
+                this.camera.targetZoom = 1;
+            }
+            
+            toggleAnimation() {
+                this.animationPaused = !this.animationPaused;
+                const btn = document.getElementById('toggle-animation');
+                btn.textContent = this.animationPaused ? 'Play' : 'Pause';
+            }
+            
+            toggleOrbits() {
+                this.showOrbits = !this.showOrbits;
+            }
+            
+            toggleLabels() {
+                this.showLabels = !this.showLabels;
+            }
+            
+            toggleMoons() {
+                this.showMoons = !this.showMoons;
+            }
+            
+            toggleAsteroids() {
+                this.showAsteroids = !this.showAsteroids;
+            }
+            
+            updateCamera() {
+                const lerpFactor = 0.05;
+                this.camera.x += (this.camera.targetX - this.camera.x) * lerpFactor;
+                this.camera.y += (this.camera.targetY - this.camera.y) * lerpFactor;
+                this.camera.zoom += (this.camera.targetZoom - this.camera.zoom) * lerpFactor;
+                
+                document.getElementById('zoom-level').textContent = this.camera.zoom.toFixed(1) + 'x';
+            }
+            
+            updatePlanets() {
+                if (!this.animationPaused) {
+                    this.time += this.animationSpeed;
+                    
+                    // Update planets
+                    this.planets.forEach((planet, index) => {
+                        if (index > 0) { // Skip sun
+                            const speedInRadians = (planet.speed * Math.PI / 180) * this.timeScale / 60;
+                            planet.angle = (planet.angle || 0) + speedInRadians;
+                            
+                            // Update moons
+                            if (planet.moons) {
+                                planet.moons.forEach(moon => {
+                                    const moonSpeedInRadians = (moon.speed * Math.PI / 180) * this.timeScale / 60;
+                                    moon.angle = (moon.angle || 0) + moonSpeedInRadians;
+                                });
+                            }
+                        }
+                    });
+                    
+                    // Update asteroids
+                    this.asteroidBelts.forEach(belt => {
+                        belt.asteroids.forEach(asteroid => {
+                            asteroid.angle += asteroid.speed * this.timeScale / 60;
+                        });
+                    });
+                }
+            }
+            
+            render() {
+                this.ctx.fillStyle = '#000';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.renderStars();
+                
+                const centerX = this.canvas.width / 2 + this.camera.x * this.camera.zoom;
+                const centerY = this.canvas.height / 2 + this.camera.y * this.camera.zoom;
+                
+                // Draw asteroid belts
+                if (this.showAsteroids) {
+                    this.renderAsteroidBelts(centerX, centerY);
+                }
+                
+                // Draw orbits
+                if (this.showOrbits) {
+                    this.renderOrbits(centerX, centerY);
+                }
+                
+                // Draw planets
+                this.renderPlanets(centerX, centerY);
+            }
+            
+            renderAsteroidBelts(centerX, centerY) {
+                this.asteroidBelts.forEach(belt => {
+                    belt.asteroids.forEach(asteroid => {
+                        const asteroidX = centerX + Math.cos(asteroid.angle) * asteroid.distance * this.camera.zoom;
+                        const asteroidY = centerY + Math.sin(asteroid.angle) * asteroid.distance * this.camera.zoom;
+                        const size = Math.max(asteroid.size * this.camera.zoom, 0.5);
+                        
+                        // Skip if asteroid is too far off screen or too small to see
+                        if (asteroidX < -50 || asteroidX > this.canvas.width + 50 || 
+                            asteroidY < -50 || asteroidY > this.canvas.height + 50 || 
+                            size < 0.5) {
+                            return;
+                        }
+                        
+                        this.ctx.globalAlpha = asteroid.opacity * Math.min(this.camera.zoom / 2, 1);
+                        this.ctx.fillStyle = asteroid.color;
+                        this.ctx.beginPath();
+                        this.ctx.arc(asteroidX, asteroidY, size, 0, Math.PI * 2);
+                        this.ctx.fill();
+                        this.ctx.globalAlpha = 1;
+                    });
+                });
+            }
+            
+            renderOrbits(centerX, centerY) {
+                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+                this.ctx.lineWidth = 1;
+                
+                // Planet orbits
+                for (let i = 1; i < this.planets.length; i++) {
+                    const planet = this.planets[i];
+                    const radius = planet.distance * this.camera.zoom;
+                    
+                    if (radius > 0 && radius < 10000) {
+                        this.ctx.beginPath();
+                        this.ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                    }
+                }
+                
+                // Asteroid belt boundaries
+                if (this.showAsteroids) {
+                    this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                    this.ctx.setLineDash([5, 5]);
+                    
+                    this.asteroidBelts.forEach(belt => {
+                        const innerRadius = belt.innerRadius * this.camera.zoom;
+                        const outerRadius = belt.outerRadius * this.camera.zoom;
+                        
+                        if (innerRadius > 0 && innerRadius < 10000) {
+                            this.ctx.beginPath();
+                            this.ctx.arc(centerX, centerY, innerRadius, 0, Math.PI * 2);
+                            this.ctx.stroke();
+                        }
+                        
+                        if (outerRadius > 0 && outerRadius < 10000) {
+                            this.ctx.beginPath();
+                            this.ctx.arc(centerX, centerY, outerRadius, 0, Math.PI * 2);
+                            this.ctx.stroke();
+                        }
+                    });
+                    
+                    this.ctx.setLineDash([]);
+                }
+            }
+            
+            renderPlanets(centerX, centerY) {
+                this.planets.forEach((planet, index) => {
+                    const planetX = centerX + Math.cos(planet.angle || 0) * planet.distance * this.camera.zoom;
+                    const planetY = centerY + Math.sin(planet.angle || 0) * planet.distance * this.camera.zoom;
+                    const radius = Math.max(planet.radius * this.camera.zoom, 2);
+                    
+                    // Skip if planet is too far off screen
+                    if (planetX < -100 || planetX > this.canvas.width + 100 || 
+                        planetY < -100 || planetY > this.canvas.height + 100) {
+                        return;
+                    }
+                    
+                    // Planet glow
+                    if (planet.name === 'Sun' || planet === this.hoveredPlanet) {
+                        const glowRadius = radius * (planet.name === 'Sun' ? 3 : 2);
+                        const gradient = this.ctx.createRadialGradient(
+                            planetX, planetY, 0,
+                            planetX, planetY, glowRadius
+                        );
+                        gradient.addColorStop(0, (planet.glowColor || planet.color) + '60');
+                        gradient.addColorStop(1, 'transparent');
+                        
+                        this.ctx.fillStyle = gradient;
+                        this.ctx.fillRect(
+                            planetX - glowRadius,
+                            planetY - glowRadius,
+                            glowRadius * 2,
+                            glowRadius * 2
+                        );
+                    }
+                    
+                    // Draw planet with texture if available
+                    this.ctx.save();
+                    this.ctx.beginPath();
+                    this.ctx.arc(planetX, planetY, radius, 0, Math.PI * 2);
+                    this.ctx.clip();
+                    
+                    if (planet.texture) {
+                        this.ctx.drawImage(
+                            planet.texture,
+                            planetX - radius,
+                            planetY - radius,
+                            radius * 2,
+                            radius * 2
+                        );
+                    } else {
+                        this.ctx.fillStyle = planet.color;
+                        this.ctx.fill();
+                    }
+                    
+                    this.ctx.restore();
+                    
+                    // Saturn's rings
+                    if (planet.hasRings && radius > 5) {
+                        this.ctx.strokeStyle = '#DDBF94';
+                        this.ctx.lineWidth = Math.max(2, 3 * this.camera.zoom);
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(planetX, planetY, radius * 1.8, radius * 0.5, 0, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                        
+                        this.ctx.lineWidth = Math.max(1, 2 * this.camera.zoom);
+                        this.ctx.beginPath();
+                        this.ctx.ellipse(planetX, planetY, radius * 2.2, radius * 0.6, 0, 0, Math.PI * 2);
+                        this.ctx.stroke();
+                    }
+                    
+                    // Planet labels
+                    if (this.showLabels && radius > 3) {
+                        this.ctx.fillStyle = 'white';
+                        this.ctx.font = `${Math.max(12, 14 * Math.min(this.camera.zoom, 2))}px Arial`;
+                        this.ctx.textAlign = 'center';
+                        this.ctx.strokeStyle = 'black';
+                        this.ctx.lineWidth = 3;
+                        this.ctx.strokeText(planet.name, planetX, planetY + radius + 25);
+                        this.ctx.fillText(planet.name, planetX, planetY + radius + 25);
+                    }
+                    
+                    // Draw moons
+                    if (planet.moons && this.showMoons) {
+                        planet.moons.forEach(moon => {
+                            const moonX = planetX + Math.cos(moon.angle || 0) * moon.distance * this.camera.zoom;
+                            const moonY = planetY + Math.sin(moon.angle || 0) * moon.distance * this.camera.zoom;
+                            const moonRadius = Math.max(moon.radius * this.camera.zoom, 1);
+                            
+                            // Moon orbit
+                            if (this.showOrbits && moon.distance * this.camera.zoom > 5) {
+                                this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
+                                this.ctx.lineWidth = 1;
+                                this.ctx.beginPath();
+                                this.ctx.arc(planetX, planetY, moon.distance * this.camera.zoom, 0, Math.PI * 2);
+                                this.ctx.stroke();
+                            }
+                            
+                            // Moon body
+                            this.ctx.fillStyle = moon.color;
+                            this.ctx.beginPath();
+                            this.ctx.arc(moonX, moonY, moonRadius, 0, Math.PI * 2);
+                            this.ctx.fill();
+                            
+                            // Moon label (only if zoomed in enough)
+                            if (this.showLabels && this.camera.zoom > 2 && moonRadius > 2) {
+                                this.ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                                this.ctx.font = `${Math.max(8, 10 * Math.min(this.camera.zoom, 1.5))}px Arial`;
+                                this.ctx.textAlign = 'center';
+                                this.ctx.strokeStyle = 'black';
+                                this.ctx.lineWidth = 2;
+                                this.ctx.strokeText(moon.name, moonX, moonY + moonRadius + 15);
+                                this.ctx.fillText(moon.name, moonX, moonY + moonRadius + 15);
+                            }
+                        });
+                    }
+                });
+            }
+            
+            renderStars() {
+                this.ctx.fillStyle = 'white';
+                for (let i = 0; i < 300; i++) {
+                    const x = (i * 1337) % this.canvas.width;
+                    const y = (i * 7331) % this.canvas.height;
+                    const size = Math.sin(this.time * 10 + i) * 0.5 + 1;
+                    
+                    this.ctx.globalAlpha = 0.2 + Math.sin(this.time * 5 + i) * 0.3;
+                    this.ctx.fillRect(x, y, size, size);
+                }
+                this.ctx.globalAlpha = 1;
+            }
+            
+            animate() {
+                this.updateCamera();
+                this.updatePlanets();
+                this.render();
+                
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+        
+        // Initialize the solar system when the page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new SolarSystem();
+        });
+    </script>
+</body>
+</html>
